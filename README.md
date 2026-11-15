@@ -135,3 +135,5 @@ No build step or package manager is required.
 ## Project and license
 
 Released under the [MIT License](LICENSE). FileBrowser Quantum and its icons, fonts and application code remain subject to their respective licenses. Interdots Pulse is an independent theme and is not an official FileBrowser Quantum product.
+
+The four screenshots show FileBrowser Quantum and Google Material Symbols. Their respective rights and licensing under the [Apache License 2.0](LICENSE-APACHE-2.0) remain unaffected.
