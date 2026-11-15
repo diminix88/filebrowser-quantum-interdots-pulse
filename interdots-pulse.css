@@ -1,0 +1,1093 @@
+/*
+ * INTERDOTS PULSE 1.0.0 · Adaptive — FileBrowser Quantum v2.0.2-stable
+ * One theme; Quantum's native toggle controls html.dark-mode.
+ * Native Quantum accent selection; blue follows the Interdots palette.
+ * No JS, external requests, app edits or breakpoint changes.
+ * Component hover feedback stays flat; native layout transitions remain intact.
+ * Inter / JetBrains Mono use locally available fonts with existing fallbacks.
+ * Select only one Interdots Pulse stylesheet. interdots-pulse.css is the canonical file.
+ * Checked against the running local v2.0.2-stable instance.
+ * Sources: official v2.0.2-stable frontend/src/utils/theme.js,
+ * frontend/public/index.html, css/base.css, css/listing.css, css/styles.css,
+ * css/_buttons.css, components/sidebar/{General,Sidebar,Links}.vue, views/Layout.vue.
+ * https://filebrowserquantum.com/en/docs/configuration/frontend/themes/
+ */
+
+/* The document mode is the palette authority, including body-teleported UI. */
+:root {
+  --pulse-brand-blue: #0c708a;
+  --pulse-accent: var(--primaryColor);
+  --pulse-accent-ink: color-mix(in srgb, var(--primaryColor) 40%, var(--pulse-text-primary));
+  --pulse-on-accent: #071114;
+  --pulse-selected: #dceff3;
+  --pulse-hover: #e5edf1;
+  --pulse-field: #ffffff;
+  --pulse-control-border: #74858f;
+  --pulse-error: #9f1239;
+  --pulse-error-bg: #fff1f2;
+  --pulse-success: #166534;
+  --pulse-success-bg: #edf9f0;
+  --pulse-background: #f5f7f8;
+  --pulse-alt-background: #edf2f4;
+  --pulse-surface-primary: #ffffff;
+  --pulse-surface-secondary: #e5edf1;
+  --pulse-text-primary: #182a34;
+  --pulse-text-secondary: #4c626f;
+  --pulse-divider: #c9d6dd;
+  --pulse-icon-background: #e5edf1;
+  --pulse-active-icon: #182a34;
+  --pulse-shadow: 0 8px 28px rgb(24 42 52 / 14%);
+  --pulse-hover-overlay: rgb(24 42 52 / 6%);
+  --pulse-font: "Inter", "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --pulse-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  color-scheme: light;
+}
+
+html.dark-mode {
+  --pulse-brand-blue: #38c4da;
+  --pulse-accent-ink: color-mix(in srgb, var(--primaryColor) 85%, var(--pulse-text-primary));
+  --pulse-on-accent: #071114;
+  --pulse-selected: #12333c;
+  --pulse-hover: #1c252b;
+  --pulse-field: #0b1014;
+  --pulse-control-border: #73838d;
+  --pulse-error: #fca5a5;
+  --pulse-error-bg: #35191e;
+  --pulse-success: #86efac;
+  --pulse-success-bg: #102c21;
+  --pulse-background: #080b0e;
+  --pulse-alt-background: #10161b;
+  --pulse-surface-primary: #12191f;
+  --pulse-surface-secondary: #202b33;
+  --pulse-text-primary: #edf3f7;
+  --pulse-text-secondary: #a9bac5;
+  --pulse-divider: #2e3b45;
+  --pulse-icon-background: #202b33;
+  --pulse-active-icon: #edf3f7;
+  --pulse-shadow: 0 8px 28px rgb(0 0 0 / 28%);
+  --pulse-hover-overlay: rgb(255 255 255 / 6%);
+  color-scheme: dark;
+}
+
+/* Quantum also declares native tokens directly on local .dark-mode nodes.
+ * Map them locally to the inherited document palette so they cannot fall back
+ * to Quantum defaults. Header classes are consumers, not palette switches.
+ */
+:root,
+.dark-mode,
+.dark-mode-header {
+  --background: var(--pulse-background);
+  --alt-background: var(--pulse-alt-background);
+  --surfacePrimary: var(--pulse-surface-primary);
+  --surfaceSecondary: var(--pulse-surface-secondary);
+  --textPrimary: var(--pulse-text-primary);
+  --textSecondary: var(--pulse-text-secondary);
+  --divider: var(--pulse-divider);
+  --iconBackground: var(--pulse-icon-background);
+  --activeWhiteIcon: var(--pulse-active-icon);
+  --surfaceElevationShadow: var(--pulse-shadow);
+  --hoverOverlay: var(--pulse-hover-overlay);
+  /* Keep Quantum's native color choices; only blue gets the Interdots Pulse identity.
+   * Do not map --blue back to --primaryColor: that would create a cycle. */
+  --blue: var(--pulse-brand-blue);
+  --dark-blue: color-mix(in srgb, var(--pulse-brand-blue) 90%, black);
+  --borderRadius: 0.75rem;
+  --borderWidth: 1px;
+}
+
+html,
+body {
+  background-color: var(--background);
+  color: var(--textPrimary);
+  font-family: var(--pulse-font);
+}
+
+/* Inherit type without replacing Quantum's Material Symbols icon fonts. */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+code,
+pre,
+kbd,
+samp,
+.input--textarea,
+.listing-items.normal .listing-item :is(.size, .modified, .duration) {
+  font-family: var(--pulse-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--pulse-accent);
+  color: var(--pulse-on-accent);
+}
+
+/* Preserve header safe areas and the resizable/collapsible sidebar geometry. */
+header.flexbar {
+  background: var(--alt-background);
+  color: var(--textPrimary);
+  border-bottom: 1px solid var(--divider);
+  box-shadow: none;
+}
+
+#sidebar {
+  background: var(--alt-background);
+  color: var(--textPrimary);
+  backdrop-filter: none;
+  border-inline-end: 1px solid var(--divider);
+}
+
+/* Layout.vue's shared overlay stays native for dialogs/search and desktop.
+ * On mobile, soften tile detail behind the open sidebar, using one scrim
+ * across the viewport. The solid tint also works without backdrop-filter. */
+@media (max-width: 768px) {
+  .overlay:has(~ #sidebar.active:not(.behind-overlay)) {
+    background-color: rgb(0 0 0 / 60%);
+    backdrop-filter: blur(4px);
+  }
+}
+
+.card,
+.inner-card {
+  background-color: var(--surfacePrimary);
+  color: var(--textPrimary);
+  border-color: var(--divider);
+}
+
+/* Sidebar card geometry and effects belong to Quantum. */
+.card:not(#sidebar .card),
+.inner-card:not(#sidebar .inner-card) {
+  border-radius: var(--borderRadius);
+  box-shadow: none;
+}
+
+#sidebar .card,
+#sidebar .inner-card {
+  background-color: transparent;
+  box-shadow: none;
+}
+
+#sidebar .sidebar-link-button,
+#sidebar .person-button,
+#sidebar .logout-button {
+  background: transparent;
+  color: var(--textPrimary);
+}
+
+#sidebar .sidebar-link-button.active,
+#sidebar .source-button.navigation-source-card,
+#sidebar .sidebar-link-button[aria-current="page"],
+#sidebar .tree-node.current-item {
+  background: var(--pulse-selected);
+  color: var(--pulse-accent-ink);
+}
+
+#sidebar .tree-node.current-item {
+  box-shadow: inset 0 0 0 1px var(--pulse-accent);
+}
+
+.link,
+#sidebar .credits a {
+  color: var(--pulse-accent-ink);
+}
+
+/* Actual Quantum buttons are .button / .button--flat, not .btn-primary. */
+.button {
+  background: var(--pulse-accent);
+  color: var(--pulse-on-accent);
+  font-weight: 600;
+}
+
+.button:not(#sidebar .button) {
+  border-radius: 0.5rem;
+  box-shadow: none;
+}
+
+button:not(.button) {
+  color: var(--textPrimary);
+}
+
+.button--flat {
+  background: var(--surfaceSecondary);
+  color: var(--pulse-accent-ink);
+  text-transform: none;
+}
+
+.button--red {
+  background: #b91c1c;
+  color: #ffffff;
+}
+
+.button--flat.button--red {
+  background: var(--pulse-error-bg);
+  color: var(--pulse-error);
+}
+
+.button--flat.button--grey {
+  color: var(--textPrimary);
+}
+
+.action:not(.button) {
+  color: var(--textPrimary);
+}
+
+/* Do not reset padding/borders on .expand-dropdown.input wrapper controls. */
+.input:not(.expand-dropdown),
+.sizeInput,
+.expand-dropdown-anchor,
+.search-bar-container {
+  background-color: var(--pulse-field);
+  color: var(--textPrimary);
+  border-color: var(--pulse-control-border);
+  border-radius: 0.5rem;
+  box-shadow: none;
+}
+
+#search-bar-input {
+  color: var(--textPrimary);
+  caret-color: var(--pulse-accent-ink);
+}
+
+.input,
+input,
+textarea {
+  caret-color: var(--pulse-accent-ink);
+  accent-color: var(--pulse-accent);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--textSecondary);
+  opacity: 1;
+}
+
+.input:not(.expand-dropdown):focus,
+.expand-dropdown-anchor:focus-within {
+  border-color: var(--pulse-accent-ink);
+}
+
+.input.input--red,
+.input:not(.expand-dropdown)[aria-invalid="true"] {
+  background-color: var(--pulse-error-bg);
+  color: var(--textPrimary);
+  border-color: var(--pulse-error);
+}
+
+.input.input--green {
+  background-color: var(--pulse-success-bg);
+  color: var(--pulse-success);
+}
+
+.form-invalid {
+  border-color: var(--pulse-error) !important;
+}
+
+/* Upstream removes outlines globally. Include keyboard-operable div controls. */
+:is(a, button, input, select, textarea, summary, [tabindex], [role="button"]):focus-visible {
+  outline: 2px solid var(--pulse-accent) !important;
+  outline-offset: 2px;
+}
+
+/* File views: preserve all item widths/heights, grids and mobile overrides. */
+.listing-item {
+  background-color: var(--surfacePrimary);
+  color: var(--textPrimary);
+  border-color: var(--divider) !important;
+  box-shadow: none !important;
+}
+
+/* Quantum listing.css uses !important for these three hover dimensions.
+ * Keep the native resting list/compact geometry instead of its 98%/1% inset.
+ * No changes to gallery/icon layouts, selection colors or icon-fill feedback.
+ */
+.listing-items:is(.list, .compact) .listing-item:hover {
+  width: 100% !important;
+  margin-left: 0 !important;
+  padding-left: 0.5em !important;
+}
+
+.listing-items .listing-item:is(:hover, .drag-hover) {
+  transform: none;
+}
+
+/* Native .clickable:hover and .drag-hover shadows are important and more
+ * specific than the resting rule. Keep flat rows without hiding selection.
+ */
+.listing-items .listing-item:not([aria-selected="true"]):is(:hover, .drag-hover) {
+  box-shadow: none !important;
+}
+
+.listing-items .listing-item:not([aria-selected="true"]):not(.drag-hover):hover {
+  background-color: var(--pulse-hover);
+}
+
+/* Gallery previews cover the tile background. A palette overlay supplies the
+ * same quiet feedback on images without changing their size or captions. */
+.listing-items.gallery .listing-item:not([aria-selected="true"]):not(.drag-hover):hover .image-preview::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: var(--pulse-hover-overlay);
+  pointer-events: none;
+}
+
+/* ListingItem marks drop targets with both .half-selected and .drag-hover.
+ * Retain that accent border in every view, without the native scale/shadow.
+ * The resting theme's important divider would otherwise hide the marker. */
+.listing-items .listing-item.half-selected {
+  border-color: var(--pulse-accent) !important;
+}
+
+.listing-items .listing-item[aria-selected="true"] {
+  --item-selected: var(--textPrimary);
+  background-color: var(--pulse-selected) !important;
+  color: var(--textPrimary) !important;
+  border-color: var(--pulse-accent) !important;
+  box-shadow: inset 0 0 0 1px var(--pulse-accent) !important;
+}
+
+.listing-items:not(.gallery) .listing-item :is(.size, .modified, .duration) {
+  color: var(--textSecondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Upstream's .white-icons is literal white; its token-based gallery override
+ * targets #listingView, which the current listing component no longer has.
+ */
+.listing-items .image-preview i.white-icons {
+  color: var(--activeWhiteIcon);
+}
+
+/* Keep native white overlay captions on previews. Plain icon tiles use the
+ * document palette instead of white text on a light icon background.
+ */
+.listing-items.gallery .listing-item:not(:has(.image-preview :is(img, video, canvas))) .text {
+  color: var(--textPrimary);
+  text-shadow: none;
+}
+
+.listing-items .pinned-indicator,
+.pin-icon-wrapper {
+  background-color: var(--surfaceSecondary);
+  color: var(--pulse-accent-ink);
+}
+
+.listing-items .message {
+  color: var(--textSecondary);
+}
+
+/* Quantum v2.0.2-stable: Icon wrapper + .text containing sibling paragraphs
+ * .name, .size, .modified > time and optional .duration. Keep the native icon
+ * on the left; wrap the name above a compact monospace metadata row.
+ * Override mobile.css's important full-width metadata and listing.css's
+ * desktop minima/ellipsis only here. Quantum still supplies the time format
+ * and the minimum row height for every slider step; wrapping may add space.
+ * Desktop columns keep the native font metrics: monospace timestamps exceed
+ * Quantum's 100px minimum column at narrow desktop widths.
+ */
+@media (max-width: 768px) {
+  .listing-item-header > :is(.size, .modified) {
+    display: none;
+  }
+
+  .listing-items:is(.list, .compact) .listing-item {
+    height: auto;
+    min-height: var(--item-height);
+  }
+
+  .listing-items:is(.list, .compact) .listing-item > div:first-child {
+    flex-shrink: 0;
+  }
+
+  .listing-items:is(.list, .compact) .listing-item .text {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .listing-items:is(.list, .compact) .listing-item .text > :is(.name, .size, .modified, .duration) {
+    width: auto !important; /* Override mobile.css's important metadata width. */
+    max-width: 100%;
+    min-width: 0;
+    flex: 0 1 auto;
+    padding-inline: 0;
+    text-align: start;
+  }
+
+  .listing-items:is(.list, .compact) .listing-item .text > .name {
+    flex-basis: 100%;
+  }
+
+  .listing-items:is(.list, .compact) .listing-item .name span {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .listing-items:is(.list, .compact) .listing-item :is(.size, .modified, .duration) {
+    font-family: var(--pulse-mono);
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .listing-items:is(.list, .compact) .listing-item :is(.modified, .duration)::before {
+    content: " · ";
+    white-space: pre-wrap;
+  }
+}
+
+#main table {
+  color: var(--textPrimary);
+  border-color: var(--divider);
+  font-variant-numeric: tabular-nums;
+}
+
+#main :is(th, td) {
+  border-color: var(--divider);
+}
+
+#main th {
+  background-color: var(--alt-background);
+  color: var(--textSecondary);
+  font-weight: 600;
+}
+
+/* Includes body-teleported prompts and context menus. No position overrides. */
+.floating-window,
+#context-menu {
+  background-color: var(--surfacePrimary);
+  color: var(--textPrimary);
+  border-color: var(--divider);
+  border-radius: var(--borderRadius);
+  box-shadow: var(--surfaceElevationShadow);
+}
+
+.floating-window .prompt-taskbar {
+  background-color: var(--alt-background);
+  color: var(--textPrimary);
+  border-color: var(--divider);
+}
+
+/* Quantum's notification text is explicitly white: use the palette-specific on-accent label. */
+#popup-notification.success,
+#popup-notification.success #popup-notification-content,
+.action .counter {
+  background-color: var(--pulse-accent);
+  color: var(--pulse-on-accent);
+}
+
+#popup-notification.error {
+  background-color: #b91c1c;
+  color: #ffffff;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button:not(#sidebar .button),
+  .action:not(#sidebar .action),
+  .listing-item,
+  .input {
+    transition-duration: 0s !important;
+  }
+}
+
+/* Let OS high-contrast colors retain authority over decorative brand colors. */
+@media (forced-colors: active) {
+  :is(a, button, input, select, textarea, summary, [tabindex], [role="button"]):focus-visible {
+    outline-color: Highlight !important;
+  }
+
+  .listing-items .listing-item[aria-selected="true"] {
+    border-color: Highlight !important;
+  }
+}
+
+/* Native quick toggles use white upstream; dark cyan surfaces need dark text. */
+#sidebar .quick-toggles .active {
+  color: var(--pulse-on-accent);
+}
+
+/* Quantum stores the native accent reference inline on html. Select only its
+ * foreground here: light blue and violet need white, the other fills dark ink.
+ * No independent picker, persisted state, or --primaryColor override. */
+html:not(.dark-mode)[style*="--primaryColor: var(--blue)"],
+html[style*="--primaryColor: var(--icon-violet)"] {
+  --pulse-on-accent: #ffffff;
+}
+
+/* Native rules hard-code white/textPrimary on these accent-filled controls. */
+#sidebar .active-settings,
+#sidebar .active-settings .settings-icon {
+  color: var(--pulse-on-accent) !important;
+}
+
+html .button-group > button.active,
+.button.action:not(.button--flat):not(.button--red) {
+  color: var(--pulse-on-accent);
+}
+
+/* Only the active file-source card in Light: leave global selection surfaces,
+ * other sidebar cards, Dark, dimensions and native motion untouched. */
+html:not(.dark-mode) #sidebar .source-button.sidebar-link-button.active,
+html:not(.dark-mode) #sidebar .source-button.navigation-source-card {
+  background-color: #c7e4ea;
+}
+
+/* Navigation renders the same source widget as a div, without the link-card
+ * class. Match Links and contain the progress bar's bottom margin in the card. */
+#sidebar .source-button.navigation-source-card {
+  display: flow-root;
+  margin-inline: auto;
+  padding: 0 0.5em;
+  border-radius: 0.5em;
+  --pulse-control-hover: var(--pulse-selected);
+}
+
+/* Quantum dropdown panels: beat the scoped native component rules without
+ * changing transparent variants, opening direction, padding or geometry. */
+.expand-dropdown-anchor.menu-panel,
+.expand-dropdown-body.menu-panel {
+  background-color: var(--pulse-field);
+  color: var(--pulse-text-primary);
+  border-color: var(--pulse-control-border);
+}
+
+.expand-dropdown-anchor.menu-panel {
+  box-shadow: none;
+}
+
+.expand-dropdown-body.menu-panel {
+  box-shadow: var(--pulse-shadow);
+}
+
+.expand-dropdown--open .expand-dropdown-anchor.menu-panel:not(.expand-upward) {
+  border-bottom-color: var(--pulse-field);
+}
+
+.expand-dropdown--open .expand-dropdown-anchor.menu-panel.expand-upward {
+  border-top-color: var(--pulse-field);
+}
+
+/* The source usage widget sets these three colors inline. Keep its native
+ * dimensions and progress width; tint the fill so overlaid text stays legible
+ * at every percentage with any of Quantum's six accent choices. */
+#sidebar .usage-info .vue-simple-progress {
+  --pulse-usage-track: color-mix(in srgb, var(--pulse-alt-background) 60%, var(--pulse-selected));
+  background-color: var(--pulse-usage-track) !important;
+  border-color: color-mix(in srgb, var(--pulse-divider) 65%, var(--pulse-selected));
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%);
+}
+
+#sidebar .usage-info .vue-simple-progress-bar {
+  background-color: color-mix(in srgb, var(--pulse-brand-blue) 45%, var(--pulse-usage-track)) !important;
+}
+
+#sidebar .usage-info .vue-simple-progress-text {
+  color: var(--pulse-text-primary) !important;
+  font-weight: 400;
+}
+
+/* Saving preferences uses Toast.vue, not the legacy #popup-notification. */
+.toast.toast--success {
+  background-color: var(--pulse-success-bg);
+  color: var(--pulse-success);
+  border-color: color-mix(in srgb, var(--pulse-success) 35%, var(--pulse-divider));
+  box-shadow: var(--pulse-shadow);
+}
+
+/* Match both scoped .terminal-output and its :not(.dark-mode) variant.
+ * Keep the watcher's native monospace font, dimensions and scrolling. */
+.file-watcher .file-watcher-output .terminal-output {
+  background-color: var(--pulse-field);
+  color: var(--pulse-text-primary);
+  border-color: var(--pulse-divider);
+}
+
+.file-watcher .terminal-header {
+  background-color: var(--pulse-alt-background);
+  color: var(--pulse-text-primary);
+  border-bottom-color: var(--pulse-divider);
+}
+
+/* Quantum v2.0.2 styles.css scales .clickable, button and .action on hover
+ * and adds an important inset shadow. Target the actual app controls only:
+ * do not reset positioned preview/player controls, chevrons, resizers or
+ * sidebar/menu opening transitions. Disabled controls also need this motion
+ * override because the upstream button:hover rule does not exclude them. */
+.button:hover,
+.action:hover,
+#sidebar :is(button, .clickable):hover,
+.button-group > button:hover,
+.menu-option-list .menu-option:hover,
+.expand-dropdown .expand-dropdown-trigger:hover,
+#context-menu button:hover,
+.floating-window button:hover,
+.listing-item-header [role="button"]:hover,
+.search-entry:hover {
+  transform: none;
+  box-shadow: none !important;
+}
+
+/* Use the existing palette hover surface for neutral controls. Keep active
+ * navigation, selected options, drop targets and disabled controls separate.
+ * The extra component scope beats Vue's scoped native hover selectors. */
+html :is(.action, .button, #sidebar button, #sidebar .clickable,
+    #sidebar .tree-node, .button-group > button, .menu-option-list .menu-option,
+    .expand-dropdown .expand-dropdown-trigger, #context-menu button, .floating-window button,
+    .listing-item-header [role="button"], .search-entry, .action ul li):not(:where(
+      :disabled, [disabled], .disabled, [aria-disabled="true"],
+      .active, .active-settings, .current-item, [aria-current="page"],
+      [aria-selected="true"], .menu-option--selected, .drag-over, .drag-hover)):hover {
+  background-color: var(--pulse-control-hover, var(--pulse-hover));
+}
+
+/* Filled actions retain their hue and label contrast. Flat/destructive
+ * variants use their own existing resting surfaces as the mix base. */
+.button:not(.button--flat):not(.sidebar-link-button):not(.person-button):not(.logout-button) {
+  --pulse-control-hover: color-mix(in srgb, var(--pulse-accent) 92%, var(--pulse-on-accent));
+}
+
+.button.button--red:not(.button--flat) {
+  --pulse-control-hover: color-mix(in srgb, #b91c1c 92%, white);
+}
+
+.button.button--flat.button--red {
+  --pulse-control-hover: color-mix(in srgb, var(--pulse-error-bg) 94%, var(--pulse-error));
+}
+
+/* Prompts.vue's close button is a native button outside .action/.button. */
+.floating-window .prompt-close {
+  --pulse-control-hover: color-mix(in srgb, #c62828 92%, white);
+}
+
+.floating-window .prompt-close:hover {
+  filter: none;
+}
+
+/* MenuOptionList and ExpandDropdown share the native 98%/1% hover inset.
+ * Restore their resting geometry, including disabled menu options. Transparent
+ * closed/search triggers have zero left padding at rest and keep it on hover. */
+html .menu-option-list .menu-option.action:hover,
+html .expand-dropdown .expand-dropdown-trigger.action:hover,
+html .search-entry:hover {
+  width: 100% !important;
+  margin-left: 0 !important;
+}
+
+html .expand-dropdown--transparent:not(.expand-dropdown--open) .expand-dropdown-trigger:hover,
+html .searchContext.expand-dropdown .expand-dropdown-trigger:hover {
+  padding-left: 0 !important;
+}
+
+/* Do not let upstream .action:hover repaint selected dropdown options. */
+html .menu-option-list .menu-option--selected:hover {
+  background-color: rgb(0 0 0 / 8%);
+}
+
+html.dark-mode .menu-option-list .menu-option--selected:hover {
+  background-color: rgb(255 255 255 / 8%);
+}
+
+/* Non-button actions can express disabled state through class/ARIA only.
+ * Quantum's :not(:disabled) hover still matches those; keep them transparent. */
+html .action:not(.button):is(.disabled, [aria-disabled="true"]):hover {
+  background-color: transparent;
+}
+
+/* Profile extension controls: let the text field shrink, not its Save label.
+ * Keep Quantum's joined corners, equal heights and native validation border. */
+.form-flex-group > .disable-viewing {
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+.form-flex-group > .disable-viewing + .form-button {
+  flex-shrink: 0;
+}
+
+/* One visible keyboard focus indicator: retain the Interdots Pulse outline and a neutral
+ * field border instead of a second accent ring. Mouse focus stays native. */
+.form-flex-group > .disable-viewing:focus-visible:not(.form-invalid):not([aria-invalid="true"]) {
+  border-color: var(--pulse-control-border);
+}
+
+/* Joined extension controls have no gap before Save. Keep the keyboard ring
+ * inside the input, leaving its validation border visible and the button clear. */
+.form-flex-group > .disable-viewing:has(+ .form-button):focus-visible {
+  outline-offset: -3px;
+}
+
+/* ButtonGroup's 100% width plus inline margins overflows preference fields.
+ * Only the profile's native accent selector needs this correction. */
+.preference-field-block .button-group {
+  margin-inline: 0;
+}
+
+@media (max-width: 768px) {
+  .preference-field-block .button-group {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .preference-field-block .button-group > button:nth-child(3n) {
+    border-right: 0;
+  }
+
+  .preference-field-block .button-group > button:nth-child(-n + 3) {
+    border-bottom: var(--borderWidth) solid var(--surfaceSecondary);
+  }
+}
+
+/* Pulse UI type scale, relative to the user's root font size. Scope text
+ * roles explicitly: never resize icon-bearing containers, editor or previews. */
+.settings-views .card-title > h2,
+.tools-list-container > .card-title > h1 {
+  font-size: 1.5rem;
+  line-height: 1.3;
+}
+
+/* Quantum switches list sizes 1–3 to compact, whose native h2 rule hides
+ * group captions. Restore only ListingView's direct group-heading wrappers. */
+.listing-items.compact > div > h2 {
+  display: block;
+}
+
+/* Keep the file-group caption clear of the preceding sticky listing header. */
+.listing-items.compact > div:has(+ .file-items) > h2 {
+  padding-top: 0.25em;
+}
+
+/* Compact's native bottom-corner rule only matches div items, while ordinary
+ * navigable entries are anchors. Match ListingItem itself for either tag. */
+.listing-items.compact :is(.folder-items, .file-items, .pinned-items) > .listing-item:first-child {
+  border-top-left-radius: 1em;
+  border-top-right-radius: 1em;
+}
+
+.listing-items.compact .lastGroup > .listing-item:last-child {
+  border-bottom-left-radius: 1em;
+  border-bottom-right-radius: 1em;
+}
+
+.settings-group-title > h3,
+.tools-list-container .tool-content > h3,
+.tools-wrapper .tool-not-found > h2,
+.floating-window .prompt-title {
+  font-size: 1.125rem;
+  line-height: 1.35;
+}
+
+/* Form field headings are labels, not additional section headings. */
+.user-profile-preferences .preference-field-block h3 {
+  font-size: 1rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.settings-views .toggle-name,
+.floating-window .toggle-name,
+.settings-views .settings-content label:not(.switch),
+.floating-window .settings-content label:not(.switch) {
+  line-height: 1.4;
+}
+
+.settings-views .settings-table thead th {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+/* Empty-state icons retain their native size; only the caption gets smaller. */
+.listing-view-root .message > span,
+.settings-views .settings-table .message > span {
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.listing-items:not(.gallery) .listing-item :is(.size, .modified, .duration),
+#status-bar .size-label {
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .settings-views .card-title > h2,
+  .tools-list-container > .card-title > h1 {
+    font-size: 1.25rem;
+  }
+}
+
+/* Match Shelf.vue's 0.5em outer gutter in these four ListingView modes.
+ * Replace stacked inline insets, not native grid columns, gaps or tile padding.
+ * Normal view, dialogs, tools and sidebar positioning remain native. */
+.listing-view-root:has(> .listing-items:is(.list, .compact, .icons, .gallery)) {
+  padding-inline: 0.5em;
+}
+
+.listing-view-root > .listing-items:is(.list, .compact, .icons, .gallery) {
+  padding-inline: 0;
+}
+
+.listing-view-root > .listing-items:is(.icons, .gallery) > :is(.folder-items, .file-items, .pinned-items) {
+  padding-inline: 0;
+}
+
+.listing-view-root > .listing-items.icons > :is(.folder-items, .file-items, .pinned-items) > .listing-item {
+  margin-inline: 0;
+}
+
+.listing-view-root > .listing-items:is(.list, .compact, .icons, .gallery) > div > h2 {
+  margin-inline: 0;
+  color: var(--textPrimary);
+  font-weight: 700;
+}
+
+/* Emphasize only the active mobile storage source, including its usage area.
+ * Keep neutral, high-contrast labels even with a different native accent. */
+@media (max-width: 768px) {
+  html:not(.dark-mode) #sidebar .source-button.sidebar-link-button.active,
+  html.dark-mode #sidebar .source-button.sidebar-link-button.active,
+  html:not(.dark-mode) #sidebar .source-button.navigation-source-card,
+  html.dark-mode #sidebar .source-button.navigation-source-card {
+    background-color: color-mix(in srgb, var(--pulse-selected) 90%, var(--pulse-brand-blue));
+    color: var(--textPrimary);
+    border-radius: var(--borderRadius);
+  }
+
+  #sidebar .source-button.sidebar-link-button.active .link-icon,
+  #sidebar .source-button.navigation-source-card .link-icon {
+    color: var(--textPrimary);
+  }
+}
+
+/* A muted ready indicator; native warning/error colors and pulse timing stay
+ * authoritative. The dark mix avoids replacing neon green with luminous mint. */
+#sidebar .realtime-pulse.ready:not(.warning):not(.danger) {
+  --pulse-ready: color-mix(in srgb, var(--pulse-success) 75%, var(--pulse-text-secondary));
+}
+
+html.dark-mode #sidebar .realtime-pulse.ready:not(.warning):not(.danger) {
+  --pulse-ready: color-mix(in srgb, var(--pulse-success) 60%, var(--pulse-surface-secondary));
+}
+
+#sidebar .realtime-pulse.ready:not(.warning):not(.danger) > .center {
+  fill: var(--pulse-ready);
+}
+
+#sidebar .realtime-pulse.ready:not(.warning):not(.danger) > .pulse {
+  fill: var(--pulse-ready);
+  stroke: var(--pulse-ready);
+}
+
+/* Match the sort bar's radius and one-pixel frame, without rounding interior
+ * list rows or changing native grid columns, gaps and preview padding. */
+.listing-view-root > .listing-items:is(.icons, .gallery) .listing-item {
+  border: var(--borderWidth) solid var(--divider);
+  border-radius: var(--borderRadius);
+}
+
+.listing-view-root > .listing-items:is(.list, .compact) > :is(.folder-items, .file-items, .pinned-items) > .listing-item:first-child {
+  border-top-left-radius: var(--borderRadius);
+  border-top-right-radius: var(--borderRadius);
+}
+
+.listing-view-root > .listing-items:is(.list, .compact) > :is(.folder-items, .file-items, .pinned-items) > .listing-item:last-child {
+  border-bottom-left-radius: var(--borderRadius);
+  border-bottom-right-radius: var(--borderRadius);
+}
+
+/* Mobile-only repairs for native search constraints, sidebar-link prompts and
+ * settings tables. Preserve desktop geometry and the underlying controls. */
+@media (max-width: 768px) {
+  .advanced-search-options-pane > .constraints:has(> .sizeInputWrapper) {
+    margin-inline: 0;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .advanced-search-options-pane .constraints .sizeInputWrapper {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.5rem;
+    margin-inline: 0;
+    min-width: 0;
+    padding: 0.5rem;
+  }
+
+  .advanced-search-options-pane .constraints .sizeInputWrapper > p {
+    margin: 0;
+    white-space: normal;
+    line-height: 1.4;
+  }
+
+  .advanced-search-options-pane .sizeInputWrapper:has(> input[type="number"]) > p::after {
+    content: " (MB)";
+  }
+
+  .advanced-search-options-pane .constraints .sizeInput {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    min-height: 2.75rem;
+    height: auto;
+    font-size: 1rem;
+    text-align: start;
+  }
+
+  .floating-window .prompt-title {
+    font-size: 1rem;
+  }
+
+  .floating-window:has(> .sidebar-links-content) > .prompt-taskbar {
+    position: relative;
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 3rem;
+    padding: 0.5rem;
+  }
+
+  .floating-window:has(> .sidebar-links-content) .prompt-taskbar-drag {
+    position: static;
+    flex: 1;
+    min-width: 0;
+    padding-inline: 0.5rem;
+  }
+
+  .floating-window:has(> .sidebar-links-content) .prompt-title {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+  }
+
+  .floating-window:has(> .sidebar-links-content) > .card-content.sidebar-links-content {
+    padding-top: 0.75rem;
+    min-width: 0;
+  }
+
+  .sidebar-links-content :is(h3, .button) {
+    font-size: 1rem;
+    line-height: 1.4;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .sidebar-links-content .link-details {
+    min-width: 0;
+    width: auto;
+    flex: 1 1 0;
+  }
+
+  .sidebar-links-content .link-name {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .sidebar-links-content .link-item > .action {
+    flex-shrink: 0;
+  }
+
+  .settings-views {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  /* ActivityViewer uses Table.vue outside settings. Keep one horizontal
+   * scroll owner and apply the same compact cells and visible empty state. */
+  .activity-viewer .results-table-scroll {
+    max-width: 100%;
+    overflow-x: visible;
+  }
+
+  /* ActivityViewer clips data cells natively. Its spanning empty cell must
+   * not become the sticky caption's own scroll container. */
+  .activity-viewer .results-table-scroll .settings-table td.settings-table__empty-cell {
+    overflow: visible;
+  }
+
+  /* Access.vue's four joined controls squeeze the name down to 16px at 320px.
+   * Stack the selectors, retaining the name and add action on the last row. */
+  .floating-window[aria-label="access-prompt"] .form-flex-group {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+  }
+
+  .floating-window[aria-label="access-prompt"] .form-flex-group > .expand-dropdown {
+    grid-column: 1 / -1;
+  }
+
+  .floating-window[aria-label="access-prompt"] .form-flex-group > :is(input, .button, .expand-dropdown),
+  .floating-window[aria-label="access-prompt"] .form-flex-group .expand-dropdown-anchor {
+    min-width: 0;
+    max-width: 100%;
+    /* Native flat-left/right rules use !important for joined desktop fields. */
+    border-radius: var(--borderRadius) !important;
+  }
+
+  .floating-window[aria-label="access-prompt"] .form-flex-group > input {
+    width: 100%;
+  }
+
+  .floating-window[aria-label="access-prompt"] .form-flex-group > .button {
+    min-height: 2.75rem;
+  }
+
+  .floating-window[aria-label="access-prompt"] > .card-content table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .floating-window[aria-label="access-prompt"] > .card-content table :is(th, td) {
+    padding: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  :is(.settings-views, .activity-viewer .results-table-scroll) .settings-table-wrapper {
+    min-width: 0;
+    max-width: 100%;
+    container-type: inline-size;
+    overscroll-behavior-x: contain;
+  }
+
+  :is(.settings-views, .activity-viewer .results-table-scroll) .settings-table-wrapper .settings-table {
+    overflow: visible;
+  }
+
+  :is(.settings-views, .activity-viewer .results-table-scroll) .settings-table-wrapper .settings-table tr > :is(th, td) {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    padding: 0.5rem;
+  }
+
+  :is(.settings-views, .activity-viewer .results-table-scroll) .settings-table-wrapper .settings-table thead .settings-table__th {
+    padding-inline-end: 1.75rem;
+  }
+
+  :is(.settings-views, .activity-viewer .results-table-scroll) .settings-table-wrapper .settings-table__empty-cell .settings-table__lonely.message {
+    position: sticky;
+    inset-inline-start: 0.5rem;
+    width: calc(100cqi - 1rem - var(--borderWidth) - var(--borderWidth));
+    max-width: 100%;
+    margin: 1rem 0;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  :is(.settings-views, .activity-viewer .results-table-scroll) .settings-table-wrapper .settings-table__lonely > i {
+    font-size: 2rem;
+  }
+
+  :is(.settings-views, .activity-viewer .results-table-scroll) .settings-table-wrapper .settings-table__lonely > span {
+    font-size: 1rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.4;
+  }
+}
